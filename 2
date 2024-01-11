@@ -1,0 +1,115 @@
+import random
+
+def genereaza_sudoku(n):
+  """
+  Generează un sudoku de dimensiune n*n.
+
+  Args:
+    n: Dimensiunea sudokuului.
+
+  Returns:
+    O listă de liste cu cifrele sudokuului.
+  """
+
+  sudoku = [[0 for _ in range(n)] for _ in range(n)]
+
+  # Generăm o listă cu toate cifrele de la 1 la n.
+
+  numere = list(range(1, n+1))
+
+  # Amestecăm lista de numere.
+
+  random.shuffle(numere)
+
+  # Parcurgem celulele sudokuului.
+
+  for i in range(n):
+    for j in range(n):
+      # Adaugăm o cifră în celulă.
+      sudoku[i][j] = numere.pop()
+
+  # Verificăm dacă sudokuul este valid.
+
+  for i in range(n):
+    for j in range(n):
+      if sudoku[i][j] in sudoku[i][:j] + sudoku[i][j+1:] + sudoku[:i, j] + sudoku[i+1:, j]:
+        # Sudokuul nu este valid.
+        return None
+
+  return sudoku
+
+def arata_sudoku(sudoku):
+  """
+  Afișează un sudoku.
+
+  Args:
+    sudoku: Sudokuul de afișat.
+  """
+
+  for i in range(len(sudoku)):
+    if i % 3 == 0:
+      print("-"*30)
+    print(" ".join([str(c) for c in sudoku[i]]))
+
+def verifica_sudoku(sudoku):
+  """
+  Verifică dacă un sudoku este valid.
+
+  Args:
+    sudoku: Sudokuul de verificat.
+
+  Returns:
+    True dacă sudokuul este valid, False altfel.
+  """
+
+  for i in range(len(sudoku)):
+    for j in range(len(sudoku)):
+      if sudoku[i][j] in sudoku[i][:j] + sudoku[i][j+1:] + sudoku[:i, j] + sudoku[i+1:, j]:
+        return False
+
+  return True
+
+def rezolva_sudoku(sudoku):
+  """
+  Reszolvă un sudoku.
+
+  Args:
+    sudoku: Sudokuul de rezolvat.
+
+  Returns:
+    True dacă sudokuul a fost rezolvat, False altfel.
+  """
+
+  # Parcurgem celulele sudokuului.
+
+  for i in range(len(sudoku)):
+    for j in range(len(sudoku)):
+      # Dacă celula este goală, încercăm să o completăm cu toate cifrele posibile.
+      if sudoku[i][j] == 0:
+        for numar in range(1, len(sudoku)+1):
+          if numar not in sudoku[i][:j] + sudoku[i][j+1:] + sudoku[:i, j] + sudoku[i+1:, j]:
+            sudoku[i][j] = numar
+            if verifica_sudoku(sudoku):
+              return True
+            else:
+              sudoku[i][j] = 0
+
+  return False
+
+if __name__ == "__main__":
+  # Generăm un sudoku.
+  sudoku = genereaza_sudoku(9)
+
+  # Afișăm sudokuul inițial.
+  print("Sudoku inițial:")
+  arata_sudoku(sudoku)
+
+  # Rezolvam sudokuul.
+  rezolvat = rezolva_sudoku(sudoku)
+
+  # Afișăm sudokuul rezolvat.
+  if rezolvat:
+    print("Sudoku rezolvat:")
+    arata_sudoku(sudoku)
+  else:
+    print("Sudokuul nu are soluție.")
